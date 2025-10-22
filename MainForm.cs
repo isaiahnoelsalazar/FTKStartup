@@ -34,9 +34,23 @@ namespace FTKStartup
                     pyCS.Pip(new string[] { ".[tool.poetry.dependencies]" });
                     SimpleFileHandler.Write("pipdone", string.Empty);
                 }
-                string gui = SimpleFileHandler.Read("build/gui.py");
-                SimpleFileHandler.Write("build/gui.py", "import os\nos.environ['TCL_LIBRARY'] = r'python3_13\\Lib\\site-packages\\tcl\\tcl8.6'\n");
-                SimpleFileHandler.Append("build/gui.py", gui);
+                if (!File.Exists("envdone"))
+                {
+                    string[] gui = SimpleFileHandler.Read("build/gui.py").Split('\n');
+                    SimpleFileHandler.Write("build/gui.py", "import os\nos.environ['TCL_LIBRARY'] = r'python3_13\\Lib\\site-packages\\tcl\\tcl8.6'\n");
+                    foreach (string line in gui)
+                    {
+                        if (!line.Contains("ASSETS_PATH = OUTPUT_PATH / Path"))
+                        {
+                            SimpleFileHandler.Append("build/gui.py", line);
+                        }
+                        else
+                        {
+                            SimpleFileHandler.Append("build/gui.py", "ASSETS_PATH = OUTPUT_PATH / Path(r\"assets\\frame0\")");
+                        }
+                    }
+                    SimpleFileHandler.Write("envdone", string.Empty);
+                }
                 Invoke(new MethodInvoker(() =>
                 {
                     Hide();
