@@ -25,6 +25,11 @@ namespace FTKStartup
                     ZipFile.ExtractToDirectory("Tkinter-Designer-1.0.7.zip", Directory.GetCurrentDirectory());
                 }
                 PyCS pyCS = new PyCS();
+                if (!File.Exists("python3_13/gotopy.py"))
+                {
+                    SimpleFileHandler.ProjectToLocation(Assembly.GetExecutingAssembly(), "gotopy.py");
+                    File.Move("gotopy.py", "python3_13/gotopy.py");
+                }
                 if (!File.Exists("pipdone"))
                 {
                     pyCS.InstallPip();
@@ -36,16 +41,16 @@ namespace FTKStartup
                 }
                 if (!File.Exists("envdone"))
                 {
-                    string gui = SimpleFileHandler.Read("build/gui.py");
-                    SimpleFileHandler.Write("build/gui.py", "import os\nos.environ['TCL_LIBRARY'] = r'python3_13\\Lib\\site-packages\\tcl\\tcl8.6'\n");
-                    SimpleFileHandler.Append("build/gui.py", gui);
+                    string gui = SimpleFileHandler.Read("build/gui1.py");
+                    SimpleFileHandler.Write("build/gui1.py", "import gotopy\nimport os\nos.environ['TCL_LIBRARY'] = r'python3_13\\Lib\\site-packages\\tcl\\tcl8.6'\n");
+                    SimpleFileHandler.Append("build/gui1.py", gui);
                     SimpleFileHandler.Write("envdone", string.Empty);
                 }
                 Invoke(new MethodInvoker(() =>
                 {
                     Hide();
                 }));
-                pyCS.RunFile("build/gui.py");
+                pyCS.RunFile("build/gui1.py");
                 Invoke(new MethodInvoker(() =>
                 {
                     Close();
